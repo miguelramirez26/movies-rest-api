@@ -11,7 +11,7 @@ const reviewsRouter = require('./routes/reviews');
 const swaggerDocument = require('./swagger');
 
 const app = express();
-const port = Number(process.env.PORT) || 3000;
+const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(helmet());
@@ -45,17 +45,17 @@ app.use((error, request, response, next) => {
   response.status(500).json({ error: 'Internal server error.' });
 });
 
-async function startServer() {
-  await connectToDatabase();
+function startServer() {
   app.listen(port, () => {
     console.log(`Movies REST API listening on port ${port}`);
   });
+
+  connectToDatabase()
+    .then(() => console.log('MongoDB connected successfully.'))
+    .catch((error) => console.error('MongoDB connection failed:', error.message));
 }
 
-startServer().catch((error) => {
-  console.error('Unable to start the server:', error);
-  process.exitCode = 1;
-});
+startServer();
 
 process.on('SIGINT', async () => {
   await closeDatabaseConnection();
