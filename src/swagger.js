@@ -7,6 +7,10 @@ const swaggerDocument = {
   },
   servers: [
     {
+      url: 'https://movies-rest-api-bmx1.onrender.com',
+      description: 'Render deployment'
+    },
+    {
       url: 'http://localhost:3000',
       description: 'Local development server'
     }
