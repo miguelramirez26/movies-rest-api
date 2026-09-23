@@ -55,7 +55,7 @@ app.get('/auth/logout', (request, response, next) => {
 });
 
 app.get('/', (request, response) => {
-  response.json({ name: 'Movies REST API', status: 'online' });
+  response.redirect('/api-docs');
 });
 
 app.get('/health', async (request, response, next) => {
