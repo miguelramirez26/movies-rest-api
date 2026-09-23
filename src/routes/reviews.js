@@ -1,6 +1,7 @@
 const express = require('express');
 const { ObjectId } = require('mongodb');
 const { connectToDatabase } = require('../db');
+const { ensureAuthenticated } = require('../auth');
 
 const router = express.Router();
 
@@ -35,7 +36,7 @@ router.get('/:id', async (request, response, next) => {
   }
 });
 
-router.post('/', async (request, response, next) => {
+router.post('/', ensureAuthenticated, async (request, response, next) => {
   try {
     const review = request.body;
     if (!review || typeof review !== 'object' || !review.movieId || !review.text) {
@@ -50,7 +51,7 @@ router.post('/', async (request, response, next) => {
   }
 });
 
-router.put('/:id', async (request, response, next) => {
+router.put('/:id', ensureAuthenticated, async (request, response, next) => {
   try {
     const reviewId = parseId(request.params.id);
     if (!reviewId) return response.status(400).json({ error: 'Invalid review ID.' });
@@ -68,7 +69,7 @@ router.put('/:id', async (request, response, next) => {
   }
 });
 
-router.delete('/:id', async (request, response, next) => {
+router.delete('/:id', ensureAuthenticated, async (request, response, next) => {
   try {
     const reviewId = parseId(request.params.id);
     if (!reviewId) return response.status(400).json({ error: 'Invalid review ID.' });

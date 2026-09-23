@@ -1,6 +1,7 @@
 const express = require('express');
 const { ObjectId } = require('mongodb');
 const { connectToDatabase } = require('../db');
+const { ensureAuthenticated } = require('../auth');
 
 const router = express.Router();
 const requiredMovieFields = ['title', 'director', 'year', 'genre', 'duration', 'rating', 'language'];
@@ -42,7 +43,7 @@ router.get('/:id', async (request, response, next) => {
   }
 });
 
-router.post('/', async (request, response, next) => {
+router.post('/', ensureAuthenticated, async (request, response, next) => {
   try {
     const movie = request.body;
     if (!hasRequiredMovieFields(movie)) {
@@ -58,7 +59,7 @@ router.post('/', async (request, response, next) => {
   }
 });
 
-router.put('/:id', async (request, response, next) => {
+router.put('/:id', ensureAuthenticated, async (request, response, next) => {
   try {
     const movieId = parseId(request.params.id);
     if (!movieId) return response.status(400).json({ error: 'Invalid movie ID.' });
@@ -78,7 +79,7 @@ router.put('/:id', async (request, response, next) => {
   }
 });
 
-router.delete('/:id', async (request, response, next) => {
+router.delete('/:id', ensureAuthenticated, async (request, response, next) => {
   try {
     const movieId = parseId(request.params.id);
     if (!movieId) return response.status(400).json({ error: 'Invalid movie ID.' });

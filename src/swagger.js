@@ -17,9 +17,34 @@ const swaggerDocument = {
   ],
   tags: [
     { name: 'Movies', description: 'Movie collection operations' },
-    { name: 'Reviews', description: 'Review collection operations' }
+    { name: 'Reviews', description: 'Review collection operations' },
+    { name: 'Authentication', description: 'GitHub authentication operations' }
   ],
   paths: {
+    '/auth/github': {
+      get: {
+        tags: ['Authentication'],
+        summary: 'Start GitHub login',
+        responses: { 302: { description: 'Redirects to GitHub for authentication.' } }
+      }
+    },
+    '/auth/github/callback': {
+      get: {
+        tags: ['Authentication'],
+        summary: 'Handle GitHub OAuth callback',
+        responses: {
+          200: { description: 'Authentication successful.' },
+          401: { $ref: '#/components/responses/Unauthorized' }
+        }
+      }
+    },
+    '/auth/logout': {
+      get: {
+        tags: ['Authentication'],
+        summary: 'Log out the current user',
+        responses: { 200: { description: 'Session ended.' } }
+      }
+    },
     '/api/movies': {
       get: {
         tags: ['Movies'],
@@ -34,6 +59,7 @@ const swaggerDocument = {
       post: {
         tags: ['Movies'],
         summary: 'Create a movie',
+        security: [{ SessionCookie: [] }],
         requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/MovieInput' } } } },
         responses: {
           201: { description: 'Movie created.', content: { 'application/json': { schema: { $ref: '#/components/schemas/Movie' } } } },
@@ -55,6 +81,7 @@ const swaggerDocument = {
       put: {
         tags: ['Movies'],
         summary: 'Replace a movie',
+        security: [{ SessionCookie: [] }],
         requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/MovieInput' } } } },
         responses: {
           200: { description: 'Movie replaced.', content: { 'application/json': { schema: { $ref: '#/components/schemas/Movie' } } } },
@@ -65,6 +92,7 @@ const swaggerDocument = {
       delete: {
         tags: ['Movies'],
         summary: 'Delete a movie',
+        security: [{ SessionCookie: [] }],
         responses: {
           204: { description: 'Movie deleted.' },
           400: { $ref: '#/components/responses/BadRequest' },
@@ -86,6 +114,7 @@ const swaggerDocument = {
       post: {
         tags: ['Reviews'],
         summary: 'Create a review',
+        security: [{ SessionCookie: [] }],
         requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/ReviewInput' } } } },
         responses: {
           201: { description: 'Review created.', content: { 'application/json': { schema: { $ref: '#/components/schemas/Review' } } } },
@@ -107,6 +136,7 @@ const swaggerDocument = {
       put: {
         tags: ['Reviews'],
         summary: 'Replace a review',
+        security: [{ SessionCookie: [] }],
         requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/ReviewInput' } } } },
         responses: {
           200: { description: 'Review replaced.', content: { 'application/json': { schema: { $ref: '#/components/schemas/Review' } } } },
@@ -117,6 +147,7 @@ const swaggerDocument = {
       delete: {
         tags: ['Reviews'],
         summary: 'Delete a review',
+        security: [{ SessionCookie: [] }],
         responses: {
           204: { description: 'Review deleted.' },
           400: { $ref: '#/components/responses/BadRequest' },
@@ -135,6 +166,14 @@ const swaggerDocument = {
         schema: { type: 'string', pattern: '^[a-fA-F0-9]{24}$', example: '507f1f77bcf86cd799439011' }
       }
     },
+    securitySchemes: {
+      SessionCookie: {
+        type: 'apiKey',
+        in: 'cookie',
+        name: 'connect.sid',
+        description: 'Session cookie created after successful GitHub login.'
+      }
+    },
     responses: {
       BadRequest: {
         description: 'The request is invalid.',
@@ -142,6 +181,10 @@ const swaggerDocument = {
       },
       NotFound: {
         description: 'The requested resource was not found.',
+        content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
+      },
+      Unauthorized: {
+        description: 'Authentication is required.',
         content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
       }
     },

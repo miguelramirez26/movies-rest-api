@@ -20,6 +20,21 @@ An Express REST API backed by MongoDB for managing movies and reviews.
 
    Use `npm run dev` during development for automatic restarts.
 
+## GitHub authentication
+
+Add these variables to `.env`:
+
+```env
+SESSION_SECRET=replace-with-a-long-random-secret
+GITHUB_CLIENT_ID=your-github-oauth-client-id
+GITHUB_CLIENT_SECRET=your-github-oauth-client-secret
+GITHUB_CALLBACK_URL=http://localhost:3000/auth/github/callback
+```
+
+For Render, set `GITHUB_CALLBACK_URL` to `https://movies-rest-api-bmx1.onrender.com/auth/github/callback` and add that exact URL to the GitHub OAuth app's Authorization callback URL.
+
+Start authentication at `GET /auth/github` and end the session at `GET /auth/logout`. The movie and review `POST`, `PUT`, and `DELETE` routes require an authenticated GitHub session; their `GET` routes remain public.
+
 ## Endpoints
 
 Both collections support `GET /`, `GET /:id`, `POST /`, `PUT /:id`, and `DELETE /:id`.
